@@ -128,6 +128,7 @@ int main(int argc, char **argv)
 
     /* Create a test run */
     int i_array[TEST_LEN], r_array[TEST_LEN];
+    srand(clock());
     for (i = 0; i < TEST_LEN; ++i)
     {
         i_array[i] = r_array[i] = rand() % TEST_LEN;
@@ -143,6 +144,8 @@ int main(int argc, char **argv)
 
     for (i = 0; i < num_attempts; ++i)
     {
+        srand(clock());
+
         // Generate two arrays of the same elements
         int i_array[num_elements], r_array[num_elements];
         for (j = 0; j < num_elements; ++j)
