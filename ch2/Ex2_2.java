@@ -8,6 +8,7 @@
 
 import java.io.*;
 import java.util.Random;
+import java.util.Arrays;
 
 interface Cmp
 {
@@ -87,11 +88,112 @@ class Quicksort
 
 class Ex2_2
 {
+    static Random rgen = new Random();
+
+    static char[] chars = "abcdefghijklmnopqrstuvwxyz".toCharArray();
+
+    static Icmp icmp = new Icmp();
+    static Scmp scmp = new Scmp();
+
+    // Adapted from http://stackoverflow.com/a/5683362
+    public static String randomString(int length)
+    {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < length; ++i)
+        {
+            char c = chars[rgen.nextInt(chars.length)];
+            sb.append(c);
+        }
+
+        return sb.toString();
+    }
+
     public static void main(String[] args)
     {
         System.out.println("Preparing to do tests...");
 
-        int[] = 
+        final int test_len = 10;
+        final int max_string_len = 10;
+        final int num_attempts = 100;
+        final int num_elements = 1000;
+        final long NSEC_PER_SEC= 1000000000;
+        
+        Integer[] i_array = new Integer[test_len];
+        String[] s_array = new String[test_len];
+
+        for (int i = 0; i < test_len; ++i)
+        {
+            i_array[i] = rgen.nextInt(test_len);
+            s_array[i] = randomString(rgen.nextInt(max_string_len));
+        }
+
+        System.out.println("Sanity test:");
+
+        System.out.println("\tInteger Array: " + Arrays.toString(i_array));
+        Quicksort.sort(i_array, 0, i_array.length-1, icmp);
+        System.out.println("\tSorted:        " + Arrays.toString(i_array));
+
+        System.out.println("\tString Array: " + Arrays.toString(s_array));
+        Quicksort.sort(s_array, 0, s_array.length-1, scmp);
+        System.out.println("\tSorted:       " + Arrays.toString(s_array));
+
+        Integer[] i_array1 = new Integer[num_elements];
+        Integer[] i_array2 = new Integer[num_elements];
+        String[] s_array1 = new String[num_elements];
+        String[] s_array2 = new String[num_elements];
+
+        Double i1_total_time, i2_total_time, s1_total_time, s2_total_time;
+        i1_total_time = i2_total_time = s1_total_time = s2_total_time = 0.0;
+        long start, end;
+
+        for (int i = 0; i < num_attempts; ++i)
+        {
+            for (int j = 0; j < test_len; ++j)
+            {
+                i_array1[j] = i_array2[j] = rgen.nextInt(test_len);
+                s_array1[j] = s_array2[j] = randomString(rgen.nextInt(max_string_len));
+            }
+
+            start = System.nanoTime();
+            Quicksort.sort(i_array1, 0, i_array1.length-1, icmp);
+            end = System.nanoTime();
+            i1_total_time += ((double)end - (double)start) / NSEC_PER_SEC;
+            System.out.println("Sorted i1");
+
+            start = System.nanoTime();
+            Quicksort.sort(i_array2, 0, i_array2.length-1, icmp);
+            end = System.nanoTime();
+            i2_total_time += ((double)end - (double)start) / NSEC_PER_SEC;
+
+            start = System.nanoTime();
+            Quicksort.sort(s_array1, 0, s_array1.length-1, scmp);
+            end = System.nanoTime();
+            s1_total_time += ((double)end - (double)start) / NSEC_PER_SEC;
+
+            start = System.nanoTime();
+            Quicksort.sort(s_array2, 0, s_array2.length-1, scmp);
+            end = System.nanoTime();
+            i2_total_time += ((double)end - (double)start) / NSEC_PER_SEC;
+
+        }
+            
+        double i1_avg_time, i2_avg_time, s1_avg_time, s2_avg_time;
+        i1_avg_time = i1_total_time / num_attempts;
+        i2_avg_time = i2_total_time / num_attempts;
+        s1_avg_time = s1_total_time / num_attempts;
+        s2_avg_time = s2_total_time / num_attempts;
+
+        System.out.println("Testing complete, statistics (in seconds):");
+        System.out.println("\tGeneric Integer Sort Total:     " + i1_total_time);
+        System.out.println("\tSpecific Integer Sort Total:    " + i2_total_time);
+        System.out.println("\tGeneric Integer Sort Average:   " + i1_avg_time);
+        System.out.println("\tSpecific Integer Sort Average:  " + i2_avg_time);
+        System.out.println("\tGeneric String Sort Total:     " + s1_total_time);
+        System.out.println("\tSpecific String Sort Total:    " + s2_total_time);
+        System.out.println("\tGeneric String Sort Average:   " + s1_avg_time);
+        System.out.println("\tSpecific String Sort Average:  " + s2_avg_time);
+
+
     }
 
 }
