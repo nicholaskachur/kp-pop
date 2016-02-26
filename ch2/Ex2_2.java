@@ -65,6 +65,62 @@ class Quicksort
         sort(v, last+1, right, cmp);
     }
 
+    // Quicksort.integerSort: sort v[left]..v[right] into increasing order using 
+    //                    Integers
+    static void integerSort(Integer[] v, int left, int right)
+    {
+        int i, last;
+
+        if (left >= right) // nothing to do 
+            return;
+        intSwap(v, left, rand(left, right));   // move pivot element
+        last = left;                        // to v[left]
+        for (i = left+1; i <= right; ++i)
+            if (v[i] < v[left])
+                intSwap(v, ++last, i);
+        intSwap(v, left, last);
+        integerSort(v, left, last-1);
+        integerSort(v, last+1, right);
+    }
+
+    // Quicksort.stringSort: sort v[left]..v[right] into increasing order using 
+    //                       Strings
+    static void stringSort(String[] v, int left, int right)
+    {
+        int i, last;
+
+        if (left >= right) // nothing to do 
+            return;
+        stringSwap(v, left, rand(left, right));   // move pivot element
+        last = left;                              // to v[left]
+        for (i = left+1; i <= right; ++i)
+            if ((v[i].compareTo(v[left])) < 0)
+                stringSwap(v, ++last, i);
+        stringSwap(v, left, last);
+        stringSort(v, left, last-1);
+        stringSort(v, last+1, right);
+    }
+
+    // Quicksort.stringSwap: swap v[i] and v[j] using String
+    static void stringSwap(String[] v, int i, int j)
+    {
+        String temp;
+        
+        temp = v[i];
+        v[i] = v[j];
+        v[j] = temp;
+    }
+
+    // Quicksort.intSwap: swap v[i] and v[j] using Integer
+    static void intSwap(Integer[] v, int i, int j)
+    {
+        Integer temp;
+        
+        temp = v[i];
+        v[i] = v[j];
+        v[j] = temp;
+    }
+
     // Quicksort.swap: swap v[i] and v[j]
     // Adapted from Kernighan & Pike's "Practice of Programming"
     static void swap(Object[] v, int i, int j)
@@ -115,27 +171,34 @@ class Ex2_2
         final int test_len = 10;
         final int max_string_len = 10;
         final int num_attempts = 100;
-        final int num_elements = 1000;
+        final int num_elements = 10000;
         final long NSEC_PER_SEC= 1000000000;
         
-        Integer[] i_array = new Integer[test_len];
-        String[] s_array = new String[test_len];
+        Integer[] i1_test_array = new Integer[test_len];
+        Integer[] i2_test_array = new Integer[test_len];
+        String[] s1_test_array = new String[test_len];
+        String[] s2_test_array = new String[test_len];
 
         for (int i = 0; i < test_len; ++i)
         {
-            i_array[i] = rgen.nextInt(test_len);
-            s_array[i] = randomString(rgen.nextInt(max_string_len));
+            i1_test_array[i] = i2_test_array[i] = rgen.nextInt(test_len);
+            s1_test_array[i] = s2_test_array[i] =
+                randomString(rgen.nextInt(max_string_len));
         }
 
         System.out.println("Sanity test:");
 
-        System.out.println("\tInteger Array: " + Arrays.toString(i_array));
-        Quicksort.sort(i_array, 0, i_array.length-1, icmp);
-        System.out.println("\tSorted:        " + Arrays.toString(i_array));
+        System.out.println("\tInteger Array: " + Arrays.toString(i1_test_array));
+        Quicksort.sort(i1_test_array, 0, i1_test_array.length-1, icmp);
+        System.out.println("\tGeneric Sort:  " + Arrays.toString(i1_test_array));
+        Quicksort.integerSort(i2_test_array, 0, i2_test_array.length-1);
+        System.out.println("\tSpecific Sort: " + Arrays.toString(i2_test_array));
 
-        System.out.println("\tString Array: " + Arrays.toString(s_array));
-        Quicksort.sort(s_array, 0, s_array.length-1, scmp);
-        System.out.println("\tSorted:       " + Arrays.toString(s_array));
+        System.out.println("\tString Array:  " + Arrays.toString(s1_test_array));
+        Quicksort.sort(s1_test_array, 0, s1_test_array.length-1, scmp);
+        System.out.println("\tGeneric Sort:  " + Arrays.toString(s1_test_array));
+        Quicksort.stringSort(s2_test_array, 0, s2_test_array.length-1);
+        System.out.println("\tSpecific Sort: " + Arrays.toString(s2_test_array));
 
         Integer[] i_array1 = new Integer[num_elements];
         Integer[] i_array2 = new Integer[num_elements];
@@ -148,17 +211,17 @@ class Ex2_2
 
         for (int i = 0; i < num_attempts; ++i)
         {
-            for (int j = 0; j < test_len; ++j)
+            for (int j = 0; j < num_elements; ++j)
             {
                 i_array1[j] = i_array2[j] = rgen.nextInt(test_len);
-                s_array1[j] = s_array2[j] = randomString(rgen.nextInt(max_string_len));
+                s_array1[j] = s_array2[j] = randomString(rgen.nextInt(
+                            max_string_len));
             }
 
             start = System.nanoTime();
             Quicksort.sort(i_array1, 0, i_array1.length-1, icmp);
             end = System.nanoTime();
             i1_total_time += ((double)end - (double)start) / NSEC_PER_SEC;
-            System.out.println("Sorted i1");
 
             start = System.nanoTime();
             Quicksort.sort(i_array2, 0, i_array2.length-1, icmp);
@@ -173,7 +236,7 @@ class Ex2_2
             start = System.nanoTime();
             Quicksort.sort(s_array2, 0, s_array2.length-1, scmp);
             end = System.nanoTime();
-            i2_total_time += ((double)end - (double)start) / NSEC_PER_SEC;
+            s2_total_time += ((double)end - (double)start) / NSEC_PER_SEC;
 
         }
             
@@ -188,14 +251,12 @@ class Ex2_2
         System.out.println("\tSpecific Integer Sort Total:    " + i2_total_time);
         System.out.println("\tGeneric Integer Sort Average:   " + i1_avg_time);
         System.out.println("\tSpecific Integer Sort Average:  " + i2_avg_time);
-        System.out.println("\tGeneric String Sort Total:     " + s1_total_time);
-        System.out.println("\tSpecific String Sort Total:    " + s2_total_time);
-        System.out.println("\tGeneric String Sort Average:   " + s1_avg_time);
-        System.out.println("\tSpecific String Sort Average:  " + s2_avg_time);
-
+        System.out.println("\tGeneric String Sort Total:      " + s1_total_time);
+        System.out.println("\tSpecific String Sort Total:     " + s2_total_time);
+        System.out.println("\tGeneric String Sort Average:    " + s1_avg_time);
+        System.out.println("\tSpecific String Sort Average:   " + s2_avg_time);
 
     }
-
 }
 
 
