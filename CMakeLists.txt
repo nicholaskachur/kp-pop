@@ -7,7 +7,6 @@
 #   $ cmake ..
 #   $ make
 #
-# TODO:
 # To run all the programs (as tests), use the `test` target
 #   $ make test
 #
@@ -18,6 +17,9 @@
 ########################################################################
 cmake_minimum_required(VERSION 3.0.0)
 project(KP-POP)
+
+find_package(Java REQUIRED)
+include(UseJava)
 
 enable_testing()
 
