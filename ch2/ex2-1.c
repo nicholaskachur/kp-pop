@@ -157,7 +157,7 @@ int main(int argc, char **argv)
         begin = clock();
         i_qsort(i_array, num_elements);
         end = clock();
-        i_total_time = ((double)end - (double)begin) / CLOCKS_PER_SEC;
+        i_total_time += ((double)end - (double)begin) / CLOCKS_PER_SEC;
 
         /* Run the test on r_qsort */
         begin = clock();
