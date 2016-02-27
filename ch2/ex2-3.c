@@ -104,6 +104,9 @@ int main(int argc, char **argv)
     printf("\tSorted:            ");
     print_array(homogeneous_test_array, TEST_LEN);
 
+    printf("Beginning performance test (%d runs on %d element arrays)...\n",
+            num_attempts, num_elements);
+
     for (i = 0; i < num_attempts; ++i)
     {
         srand(clock());
