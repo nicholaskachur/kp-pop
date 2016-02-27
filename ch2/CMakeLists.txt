@@ -13,3 +13,7 @@ add_test( ex2-2 ${Java_JAVA_EXECUTABLE} -cp ${ex2-2_jar} Ex2_2 )
 
 add_executable( ex2-3 ex2-3.c )
 add_test( ex2-3 ${CMAKE_CURRENT_BINARY_DIR}/ex2-3 100000 100 )
+
+add_executable( ex2-4 ex2-4.c )
+add_test( ex2-4 ${CMAKE_CURRENT_BINARY_DIR}/ex2-4 1000 100 )
+
