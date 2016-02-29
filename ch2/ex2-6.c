@@ -31,6 +31,7 @@ enum { NVINIT = 1, NVGROW = 2 };
 int addname(Nameval newname)
 {
     Nameval *nvp;
+    int i;
 
     if (nvtab.nameval == NULL) { /* first time */
         nvtab.nameval = (Nameval *) malloc(NVINIT * sizeof(Nameval));
@@ -38,6 +39,7 @@ int addname(Nameval newname)
             return -1;
         nvtab.max = NVINIT;
         nvtab.nval = 0;
+        nvtab.nameval[0].name = NULL; /* make empty our first space */
     } else if (nvtab.nval >= nvtab.max) { /* grow */
         nvp = (Nameval *) realloc(nvtab.nameval,
                 (NVGROW*nvtab.max) * sizeof(Nameval));
@@ -45,23 +47,22 @@ int addname(Nameval newname)
             return -1;
         nvtab.max *= NVGROW;
         nvtab.nameval = nvp;
+        for (i = nvtab.nval; i < nvtab.max; ++i)
+        { /* null out (make empty) all our new spaces */
+            nvtab.nameval[i].name = NULL;
+        }
     }
 
-    int i;
     for (i = 0; i < nvtab.max; ++i)
     {
-        if (nvtab.nameval[i].name == NULL) {
+        if (nvtab.nameval[i].name == NULL) { /* search for empty spaces */
             nvtab.nameval[i] = newname;
             nvtab.nval++;
-            printf("Added a name in an unused space: (%s, %d)\n",
-                    newname.name, newname.value);
             return i;
         }
     }
-    /* no empty space found, add at the end */
+    /* no empty space found, add at the end; this shouldn't happen */
     nvtab.nameval[nvtab.nval] = newname;
-    printf("Added a name at the end: (%s, %d)\n", nvtab.nameval[nvtab.nval].name,
-            nvtab.nameval[nvtab.nval].value);
     return nvtab.nval++;
 }
 
@@ -96,7 +97,7 @@ void print_nvtab()
     }
 
     int i;
-    for (int i = 1; i < nvtab.nval; ++i)
+    for (int i = 1; i < nvtab.max; ++i)
     {
         if (nvtab.nameval[i].name == NULL) { /* subsequent elements */
             printf(", (NULL)");
@@ -127,17 +128,19 @@ int main(int argc, char **argv)
 
     printf("nvtab initial state:\n\t");
     print_nvtab();
+    printf("\n");
 
     delname(nv2.name);
     delname(nv2.name); /* this shouldn't do anything */
     delname(nv3.name);
-    printf("\nnvtab after deleting second and third elements:\n\t");
+    printf("nvtab after deleting second and third elements:\n\t");
     print_nvtab();
+    printf("\n");
 
     nv6.name = "Rob";
     nv6.value = 9001;
     addname(nv6);
-    printf("\nnvtab after adding a new element:\n\t");
+    printf("nvtab after adding a new element:\n\t");
     print_nvtab();
     printf("\n");
 
