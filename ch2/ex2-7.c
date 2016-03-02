@@ -170,8 +170,6 @@ int main(int argc, char **argv)
     char name4[] = "Rebecca";
     char name5[] = "Misha";
     char name6[] = "Rob";
-    char name7[] = "Kevin";
-    char name8[] = "Brian";
 
     n1 = newitem(name1, 0);
     n2 = newitem(name2, 1);
@@ -179,8 +177,6 @@ int main(int argc, char **argv)
     n4 = newitem(name4, 3);
     n5 = newitem(name5, 4);
     n6 = newitem(name6, 5);
-    n7 = newitem(name7, 6);
-    n8 = newitem(name8, 7);
 
     nvlist = addfront(nvlist, n1);
     nvlist = addfront(nvlist, n2);
