@@ -23,3 +23,6 @@ add_test( ex2-6 ${CMAKE_CURRENT_BINARY_DIR}/ex2-6 )
 add_executable( ex2-7 ex2-7.c )
 add_test( ex2-7 ${CMAKE_CURRENT_BINARY_DIR}/ex2-7 )
 
+add_executable( ex2-8 ex2-8.c )
+add_test( ex2-8 ${CMAKE_CURRENT_BINARY_DIR}/ex2-8 )
+

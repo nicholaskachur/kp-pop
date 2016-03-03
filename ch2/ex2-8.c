@@ -24,8 +24,10 @@ Nameval *newitem(char *name, int value)
     Nameval *newp;
 
     newp = (Nameval *) malloc(sizeof(Nameval));
-    if (newp == NULL)
-        return newp; /* well, _you're_ screwed */
+    if (newp == NULL) {
+        printf("Failed to allocate newitem (%s, %d)\n", name, value);
+        exit(EXIT_FAILURE);
+    }
     newp->name = name;
     newp->value = value;
     newp->next = NULL;
@@ -72,28 +74,47 @@ void print_list(Nameval *listp)
 /* ireverse: iteratively reverse a list in place, returns the new head pointer */
 Nameval *ireverse(Nameval *listp)
 {
-    return listp;
+    Nameval *nextp;
+    Nameval *prevp = NULL;
+
+    for ( ; listp != NULL; listp = nextp)
+    {
+        nextp = listp->next;
+        listp->next = prevp;
+        prevp = listp;
+
+    }
+    return prevp;
 }
 
-/* rreverse: recursively reverse a list in place, returns the new head pointer */
+/* rreverse: recursively reverse a list in place, returns the new head pointer
+ * Adapted from: http://stackoverflow.com/a/354937
+ */
 Nameval *rreverse(Nameval *listp)
 {
-    if (listp == NULL)
+    if (listp == NULL) /* trivial case, list is empty */
         return listp;
+    if (listp->next == NULL) { /* base case, we've reached the end of the list */
+        return listp;
+    }
     
-    return listp;
+    Nameval *nextp = listp->next;
+    listp->next = NULL;
+    Nameval *remainderp = rreverse(nextp);
+    nextp->next = listp;
+
+    return remainderp;
 }
 
 int main(int argc, char **argv)
 {
-    Nameval *n1, *n2, *n3, *n4, *n5;
-    char *name1, *name2, *name3, *name4, *name5;
+    Nameval *nvlist, *n1, *n2, *n3, *n4, *n5;
 
-    name1 = "Nicholas";
-    name2 = "Harlan";
-    name3 = "Rob";
-    name4 = "Dario";
-    name5 = "Brian";
+    char name1[] = "Nicholas";
+    char name2[] = "Harlan";
+    char name3[] = "Rob";
+    char name4[] = "Dario";
+    char name5[] = "Brian";
 
     n1 = newitem(name1, 0);
     n2 = newitem(name2, 1);
@@ -101,26 +122,24 @@ int main(int argc, char **argv)
     n4 = newitem(name4, 3);
     n5 = newitem(name5, 4);
 
-    Nameval *nvlist;
     nvlist = addfront(nvlist, n1);
     nvlist = addfront(nvlist, n2);
     nvlist = addfront(nvlist, n3);
     nvlist = addfront(nvlist, n4);
     nvlist = addfront(nvlist, n5);
 
-    printf("n1 is (%s, %d)\n", n1->name, n1->value);
     printf("nvlist initial state:\n\t");
-    //print_list(nvlist);
+    print_list(nvlist);
     printf("\n");
 
     nvlist = ireverse(nvlist);
     printf("nvlist after iterative reverse:\n\t");
-    //print_list(nvlist);
+    print_list(nvlist);
     printf("\n");
 
     nvlist = rreverse(nvlist);
     printf("nvlist after recursive reverse:\n\t");
-    //print_list(nvlist);
+    print_list(nvlist);
     printf("\n");
 
     freeall(nvlist);
