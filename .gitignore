@@ -1,0 +1,9 @@
+# Ignore Compiled files
+*.out
+*.out.dSYM
+*.o
+*.jar
+*.class
+
+# Ignore build/ directory
+build/
