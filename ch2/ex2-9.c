@@ -1,5 +1,6 @@
 /***********************************************************************
- * Implements a generic list type and shows a small demonstration.
+ * Implements a generic list type, implements some sample operations
+ * and demonstrates them in the main function.
  *
  * Author: Nicholas Kachur <nick.e.kachur@gmail.com>
  ***********************************************************************/
@@ -11,10 +12,11 @@
 typedef struct ListElement ListElement;
 struct ListElement {
     void *data;
-    ListElement *next;
+    ListElement *next; /* in list */
 };
 
-/* newitem: create new item from data (cast to a void*) and 
+/* newitem: create new item from void * to its data
+ * Adapted from Kernighan & Pike "Practice of Programming"
  */
 ListElement *newitem(void *data)
 {
@@ -22,7 +24,7 @@ ListElement *newitem(void *data)
 
     newp = (ListElement *) malloc(sizeof(ListElement));
     if (newp == NULL) {
-        printf("Call to newitem failed, sorry bro.\n");
+        fprintf(stderr, "Failed to malloc\n");
         exit(EXIT_FAILURE);
     }
     newp->data = data;
@@ -49,121 +51,103 @@ void freeall(ListElement *listp)
     for ( ; listp != NULL; listp = next)
     {
         next = listp->next;
-        /* assumes data is freed elsewhere */
+        /* assumes name is freed elsewhere */
         free(listp);
     }
 }
 
-/* apply: execute fn for each element in listp
- * Adapted from Kernighan & Pike "Practice of Programming"
+/* reverse: reverse a list in place, returns the new head pointer
+ * Adapted from: http://stackoverflow.com/a/354937
  */
-void apply(ListElement *listp, void (*fn)(ListElement*, void*), void *arg)
+ListElement *reverse(ListElement *listp)
 {
-    for ( ; listp != NULL; listp = listp->next)
-        (*fn)(listp, arg); /* call the function */
+    if (listp == NULL) /* trivial case, list is empty */
+        return listp;
+    if (listp->next == NULL) /* base case, we've reached the end of the list */
+        return listp;
+    
+    ListElement *nextp = listp->next;
+    listp->next = NULL;
+    ListElement *remainderp = reverse(nextp);
+    nextp->next = listp;
+
+    return remainderp;
 }
 
-/* printint: print a ListElement that has an int * as the data */
-void printint(ListElement *p, void *arg)
+/* print_strlist: pretty print out listp which uses strings as data */
+void print_strlist(ListElement *listp)
 {
-    char *fmt;
+    if (listp == NULL)
+        return;
 
-    fmt = (char *)arg;
-    printf(fmt, *(int *)p->data);
-}
-
-/* printstr: print a ListElement that has a char * as the data */
-void printstr(ListElement *p, void *arg)
-{
-    char *fmt;
-
-    fmt = (char *)arg;
-    printf(fmt, (char *)p->data);
-}
-
-/* insertbefore: insert newp into listp before the item with name matchname, 
- * returns 1 if newp was inserted, -1 if it was not
- */
-int insertbefore(ListElement *listp, void *matchdata, ListElement *newp,
-        int (*match)(void *p1, void *p2))
-{
-    ListElement *prevp = NULL;
-    for ( ; listp != NULL; listp = listp->next)
+    printf("(%s)", (char *)listp->data);
+    for (listp = listp->next; listp != NULL; listp = listp->next)
     {
-        if ((*match)(listp->data, matchdata))
-        {
-            if (prevp != NULL)
-                prevp->next = newp;
-            newp->next = listp;
-            return 1;
-        }
-        prevp = listp;
+        printf(", (%s)", (char *)listp->data);
     }
-
-    return -1;
 }
 
-/* matchint: return 1 if (int *)d1 == (int *)d2, else return 0 */
-int matchint(void *d1, void *d2)
+/* print_intlist: pretty print out listp which uses ints as data */
+void print_intlist(ListElement *listp)
 {
-    int i1 = *(int *)d1;
-    int i2 = *(int *)d2;
+    if (listp == NULL)
+        return;
 
-    return i1 == i2;
+    printf("(%d)", *(int *)listp->data);
+    for (listp = listp->next; listp != NULL; listp = listp->next)
+    {
+        printf(", (%d)", *(int *)listp->data);
+    }
 }
-
-/* matchstr: return 1 if strcmp((char *)d1, (char *)d2) == 0, else return 0 */
-int matchstr(void *d1, void *d2)
-{
-    char *s1 = (char *)d1;
-    char *s2 = (char *)d2;
-
-    return strcmp(s1, s2) == 0;
-}
-
 int main(int argc, char **argv)
 {
-    ListElement *p1, *p2, *p3, *p4, *p5, *p6, *p7, *p8;
+    ListElement *strlist, *intlist, *n1, *n2, *n3, *n4, *n5, *n6, *n7, *n8;
+
+    char name1[] = "Nicholas";
+    char name2[] = "Namoi";
+    char name3[] = "Noah";
+    char name4[] = "Lizzie";
 
     int i1 = 0;
     int i2 = 1;
     int i3 = 2;
     int i4 = 3;
 
-    char s1[] = "Nicholas";
-    char s2[] = "Noah";
-    char s3[] = "Lizzie";
-    char s4[] = "Naomi";
+    n1 = newitem(name1);
+    n2 = newitem(name2);
+    n3 = newitem(name3);
+    n4 = newitem(name4);
 
-    p1 = newitem((void *)&i1);
-    p2 = newitem((void *)&i2);
-    p3 = newitem((void *)&i3);
-    p4 = newitem((void *)&i4);
-    p5 = newitem((void *)s1);
-    p6 = newitem((void *)s2);
-    p7 = newitem((void *)s3);
-    p8 = newitem((void *)s4);
+    n5 = newitem(&i1);
+    n6 = newitem(&i2);
+    n7 = newitem(&i3);
+    n8 = newitem(&i4);
 
-    ListElement *intlist, *strlist;
+    strlist = addfront(strlist, n1);
+    strlist = addfront(strlist, n2);
+    strlist = addfront(strlist, n3);
+    strlist = addfront(strlist, n4);
 
-    intlist = addfront(intlist, p1);
-    intlist = addfront(intlist, p2);
-    intlist = addfront(intlist, p3);
-    intlist = addfront(intlist, p4);
+    intlist = addfront(intlist, n5);
+    intlist = addfront(intlist, n6);
+    intlist = addfront(intlist, n7);
+    intlist = addfront(intlist, n8);
 
-    strlist = addfront(strlist, p5);
-    strlist = addfront(strlist, p6);
-    strlist = addfront(strlist, p7);
-    strlist = addfront(strlist, p8);
+    printf("strlist & intlist initial state:\n\t");
+    print_strlist(strlist);
+    printf("\n\t");
+    print_intlist(intlist);
+    printf("\n");
 
-    printf("intlist is:\n");
-    apply(intlist, printint, "(%d)\n");
+    strlist = reverse(strlist);
+    intlist = reverse(intlist);
+    printf("reversed:\n\t");
+    print_strlist(strlist);
+    printf("\n\t");
+    print_intlist(intlist);
+    printf("\n");
 
-    printf("strlist is:\n");
-    apply(strlist, printstr, "(%s)\n");
-
-    freeall(intlist);
     freeall(strlist);
-    
-    return 0;
+    freeall(intlist);
 }
+
